@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 // Config
 import { envConfig } from './config/env.config';
 
 import { CategoriesModule } from './categories/categories.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { CommonModule } from './common/common.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CommonModule } from './common/common.module';
     CategoriesModule,
     MongooseModule.forRoot(process.env.MONGODB),
     CommonModule,
+    FilesModule,
   ],
 })
 export class AppModule {}
