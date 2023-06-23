@@ -39,6 +39,7 @@ export class FilesService {
   }
 
   private handleException(error: any) {
-    throw new InternalServerErrorException(`Can't create category`);
+    // console.log(error);
+    throw new InternalServerErrorException(`The image can't upload`);
   }
 }
