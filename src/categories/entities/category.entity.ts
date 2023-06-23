@@ -19,6 +19,7 @@ export class Category extends Document {
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
 
+// Remove items that don't need to be displayed
 CategorySchema.methods.toJSON = function () {
   const { __v, wasDeleted, _id, ...category } = this.toObject();
 

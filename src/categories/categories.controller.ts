@@ -6,8 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+// Services
 import { CategoriesService } from './categories.service';
+
+// DTO
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
@@ -19,6 +25,8 @@ export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
+  // token validation
+  @UseGuards(AuthGuard())
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoriesService.create(createCategoryDto);
   }
@@ -34,6 +42,8 @@ export class CategoriesController {
   }
 
   @Patch(':id')
+  // token validation
+  @UseGuards(AuthGuard())
   update(
     @Param('id', MongoIdPipe) id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -42,6 +52,8 @@ export class CategoriesController {
   }
 
   @Delete(':id')
+  // token validation
+  @UseGuards(AuthGuard())
   remove(@Param('id', MongoIdPipe) id: string) {
     return this.categoriesService.remove(id);
   }

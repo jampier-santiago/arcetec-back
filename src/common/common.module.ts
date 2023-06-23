@@ -1,8 +1,11 @@
 // Packages
 import { Module } from '@nestjs/common';
 
-// Elements
-import { AxiosAdapter } from './adapter/axios.adapter';
+// Services
+import { HandleErrorsService } from './services/handle-errors/handle-errors.service';
 
-@Module({ providers: [AxiosAdapter], exports: [AxiosAdapter] })
+@Module({
+  providers: [HandleErrorsService],
+  exports: [HandleErrorsService],
+})
 export class CommonModule {}

@@ -1,16 +1,18 @@
 // Packages
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { CloudinaryResponse } from './cloudinary-response';
+
+// Services
 import { CloudinaryService } from 'nestjs-cloudinary';
+import { HandleErrorsService } from 'common/services/handle-errors/handle-errors.service';
 
 @Injectable()
 export class FilesService {
-  constructor(private readonly cloudinaryService: CloudinaryService) {}
+  constructor(
+    private readonly cloudinaryService: CloudinaryService,
+    private readonly handleErrorsService: HandleErrorsService,
+  ) {}
 
   async create(file: Express.Multer.File): Promise<CloudinaryResponse> {
     // Check if the size of the file is more than 1M
@@ -26,20 +28,17 @@ export class FilesService {
       );
     }
 
+    // Try to upload the image to cloudinary
     try {
       const data = await this.cloudinaryService.uploadFile(file);
       return data.secure_url;
     } catch (error) {
-      this.handleException(error);
+      this.handleErrorsService.handleException(error, `The image can't upload`);
     }
   }
 
+  // Get the image by id
   findOne(id: string) {
     return this.cloudinaryService.cloudinary.source(id);
-  }
-
-  private handleException(error: any) {
-    // console.log(error);
-    throw new InternalServerErrorException(`The image can't upload`);
   }
 }

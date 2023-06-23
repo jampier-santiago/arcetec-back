@@ -1,42 +1,39 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+// Packages
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
 
+// Services
+import { HandleErrorsService } from '../common/services/handle-errors/handle-errors.service';
+
+// DTO
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
+// Entities
 import { Category } from './entities/category.entity';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     @InjectModel(Category.name) private readonly categoryModel: Model<Category>,
+    private readonly handleErrorsService: HandleErrorsService,
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
     createCategoryDto.name = createCategoryDto.name.toLowerCase().trim();
-
-    if (!createCategoryDto.description)
-      throw new BadRequestException('Field description is empty');
-
-    if (!createCategoryDto.image)
-      throw new BadRequestException('Field image is empty');
 
     try {
       const category = await this.categoryModel.create(createCategoryDto);
 
       return category;
     } catch (error) {
-      this.handleException(error);
+      this.handleErrorsService.handleException(error, `Can't create category`);
     }
   }
 
   async findAll() {
+    // Show only active categories
     return await this.categoryModel.find({ wasDeleted: false });
   }
 
@@ -68,7 +65,7 @@ export class CategoriesService {
     try {
       await category.updateOne(updateCategoryDto, { new: true });
     } catch (error) {
-      this.handleException(error);
+      this.handleErrorsService.handleException(error, `Can't update category`);
     }
 
     return { ...category.toJSON, ...updateCategoryDto };
@@ -77,20 +74,13 @@ export class CategoriesService {
   async remove(id: string) {
     const category = await this.findOne(id);
 
+    // Change the variable in charge of the category state
     try {
       await category.updateOne({ wasDeleted: true }, { new: true });
     } catch (error) {
-      this.handleException(error);
+      this.handleErrorsService.handleException(error, `Can't remove category`);
     }
 
     return `The category was deleted succesfully`;
-  }
-
-  private handleException(error: any) {
-    if (error.code === 11000) {
-      throw new BadRequestException(`Category exist in db`);
-    }
-
-    throw new InternalServerErrorException(`Can't create category`);
   }
 }

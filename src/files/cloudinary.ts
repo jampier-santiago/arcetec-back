@@ -1,6 +1,7 @@
 // Packages
 import { v2 as cloudinary } from 'cloudinary';
 
+// Configuration with cloudinary credentials
 export const CloudinaryProvider = {
   useFactory: () => {
     return cloudinary.config({
