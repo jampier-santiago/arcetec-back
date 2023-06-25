@@ -14,7 +14,9 @@ export class FilesService {
     private readonly handleErrorsService: HandleErrorsService,
   ) {}
 
-  async create(file: Express.Multer.File): Promise<CloudinaryResponse> {
+  async create(
+    file: Express.Multer.File,
+  ): Promise<{ url: CloudinaryResponse }> {
     // Check if the size of the file is more than 1M
     if (file.size > 1000000) {
       throw new BadRequestException(
@@ -31,7 +33,7 @@ export class FilesService {
     // Try to upload the image to cloudinary
     try {
       const data = await this.cloudinaryService.uploadFile(file);
-      return data.secure_url;
+      return { url: data.secure_url };
     } catch (error) {
       this.handleErrorsService.handleException(error, `The image can't upload`);
     }

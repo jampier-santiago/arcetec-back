@@ -50,7 +50,7 @@ export class CategoriesService {
     // Find by name
     if (!category)
       category = await this.categoryModel.findOne({
-        name: term,
+        name: term.toLowerCase().trim(),
         wasDeleted: false,
       });
 
@@ -61,6 +61,9 @@ export class CategoriesService {
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {
     const category = await this.findOne(id);
+
+    if (updateCategoryDto.name)
+      updateCategoryDto.name = updateCategoryDto.name.toLowerCase();
 
     try {
       await category.updateOne(updateCategoryDto, { new: true });
@@ -77,10 +80,9 @@ export class CategoriesService {
     // Change the variable in charge of the category state
     try {
       await category.updateOne({ wasDeleted: true }, { new: true });
+      return { message: `The category was deleted succesfully` };
     } catch (error) {
       this.handleErrorsService.handleException(error, `Can't remove category`);
     }
-
-    return `The category was deleted succesfully`;
   }
 }
